@@ -1,11 +1,10 @@
-import React from "react";
-import ReactDom from "react-dom/client";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import './index.css';
-
 
 function Square(props) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className='square' onClick={() => props.onClick()}>
             {props.value}
         </button>
     );
@@ -13,73 +12,67 @@ function Square(props) {
 
 class Board extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true,
-        }
-    }
-
-    handleClick(i) {
-        const copiedSquares = this.state.squares.slice();
-        if (calculateWinner(copiedSquares) || copiedSquares[i]) {
-            return;
-        }
-        copiedSquares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({
-            squares: copiedSquares,
-            xIsNext: !this.state.xIsNext
-        })
-    }
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         squares: Array(9).fill(null),
+    //         xIsNext: true
+    //     }
+    // }
 
     renderSquare(i) {
         return (
-            // <Square
-            //     value={this.state.squares[i]}
-            //     onClick={() => this.handleClick(i)} />
-
             <Square
                 value={this.props.squares[i]}
-                onClick={() => this.props.onClick(i)} />
-        );
+                onClick={() => this.props.onClick(i)}
+            />
+        )
     }
 
-    render() {
+    // squareClickFunction(i) {
+    //     const copy_square = this.state.squares.slice();
+    //     if(calculateWinner(copy_square) || copy_square[i]){
+    //         return;
+    //     }
+    //     copy_square[i] = this.state.xIsNext ? 'X' : 'O';
+    //     this.setState({
+    //         squares: copy_square,
+    //         xIsNext: !this.state.xIsNext,
+    //     });
+    // }
 
-        // const winner = calculateWinner(this.state.squares);
+    render() {
+        // const Winner = calculateWinner(this.state.squares);
         // let status;
-        // if (winner) {
-        //     status = 'Winner is ' + winner;
-        // }
-        // else {
-        //     status = 'Next player is ' + (this.state.xIsNext ? 'X' : 'O');
-        // }
+
+        // if (Winner)
+        //     status = 'Winner is ' + Winner;
+        // else
+        //     status = 'Next player : ' + (this.state.xIsNext ? 'X' : 'O');
 
         return (
-            <div>
-                <div className="board-row">
+            <div className='board'>
+                <div className='board-row'>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
                 </div>
-                <div className="board-row">
+                <div className='board-row'>
                     {this.renderSquare(3)}
                     {this.renderSquare(4)}
                     {this.renderSquare(5)}
                 </div>
-                <div className="board-row">
+                <div className='board-row'>
                     {this.renderSquare(6)}
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </div>
             </div>
-        )
+        );
     }
 }
 
 class Game extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -90,32 +83,25 @@ class Game extends React.Component {
         }
     }
 
-    handleClick(i) {
+    squareClickFunction(i) {
         const history = this.state.history;
         const current = history[history.length - 1];
-        const squares = current.squares.slice();
-        if (calculateWinner(squares) || squares[i]) {
+
+        const copy_square = current.squares.slice();
+        if (calculateWinner(copy_square) || copy_square[i]) {
             return;
         }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        copy_square[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
+            //squares: copy_square,
             history: history.concat([{
-                squares: squares,
+                squares: copy_square,
             }]),
-            stepNumber: 0,
             xIsNext: !this.state.xIsNext,
         });
     }
 
-    jumpTo(step) {
-        this.setState({
-            stepNumber: step,
-            xIsNext: (step % 2) === 0,
-        });
-    }
-
     render() {
-
         const history = this.state.history;
         const current = history[history.length - 1];
         const winner = calculateWinner(current.squares);
@@ -125,7 +111,7 @@ class Game extends React.Component {
                 'Go to move #' + move :
                 'Go to game start';
             return (
-                <li key={move}>
+                <li>
                     <button onClick={() => this.jumpTo(move)}>{desc}</button>
                 </li>
             );
@@ -133,19 +119,16 @@ class Game extends React.Component {
 
         let status;
         if (winner) {
-            status = 'Winner is ' + winner;
+            status = 'Winner: ' + winner;
+        } else {
+            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
-        else {
-            status = 'Next player is ' + (this.state.xIsNext ? 'X' : 'O');
-        }
-
-
         return (
             <div className="game">
                 <div className="game-board">
                     <Board
                         squares={current.squares}
-                        onClick={(i) => this.handleClick(i)}
+                        onClick={(i) => this.squareClickFunction(i)}
                     />
                 </div>
                 <div className="game-info">
@@ -157,11 +140,10 @@ class Game extends React.Component {
     }
 }
 
-
-const root = ReactDom.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Game />);
 
-// Helper Function
+
 function calculateWinner(squares) {
     const lines = [
         [0, 1, 2],
